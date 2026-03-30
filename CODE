@@ -1,0 +1,112 @@
+#define ldr A0
+int ldr_sense;
+String status=" ";
+
+#define ir1 2
+#define ir2 3
+#define ir3 4
+int sense1,sense2,sense3;
+int sense1_i=0,sense2_i=0,sense3_i=0;
+
+#define led1 8
+#define led2 9
+#define led3 10
+
+void setup()
+{
+  Serial.begin(9600);
+
+  pinMode(ldr,INPUT);
+  pinMode(ir1,INPUT);
+  pinMode(ir2,INPUT);
+  pinMode(ir3,INPUT);
+
+  pinMode(led1,OUTPUT);
+  pinMode(led2,OUTPUT);
+  pinMode(led3,OUTPUT);
+  digitalWrite(led1,LOW);
+  digitalWrite(led2,LOW);
+  digitalWrite(led3,LOW);
+
+  pinMode(13,OUTPUT);
+  digitalWrite(13,LOW);
+}
+void loop()
+{
+  ldr_sense=analogRead(ldr);
+  ldr_sense=map(ldr_sense,0,1023,100,0);
+  Serial.print("SENSE : ");Serial.println(ldr_sense);
+
+  sense1=digitalRead(ir1);
+  sense1=1-sense1;
+
+  sense2=digitalRead(ir2);
+  sense2=1-sense2;
+
+  sense3=digitalRead(ir3);
+  sense3=1-sense3;
+
+  if(ldr_sense <= 30)
+  {
+    status="NIGHT";
+    street_light();
+  }
+  else
+  {
+    sense1_i=0;
+    sense2_i=0;
+    sense3_i=0;
+    status="MORNING";
+    digitalWrite(led1,LOW);
+    digitalWrite(led2,LOW);
+    digitalWrite(led3,LOW);
+  }
+  digitalWrite(13,HIGH);delay(300);digitalWrite(13,LOW);delay(200);
+}
+void street_light()
+{
+  if(sense1==1)
+  {
+    sense1_i=0;
+    digitalWrite(led1,HIGH);
+  }
+  else
+  {
+    sense1_i=sense1_i+1;
+    if(sense1_i >= 2)
+    {
+      sense1_i=5;
+      digitalWrite(led1,LOW);
+    }
+  }
+
+  if(sense2==1)
+  {
+    sense2_i=0;
+    digitalWrite(led2,HIGH);
+  }
+  else
+  {
+    sense2_i=sense2_i+1;
+    if(sense2_i >= 2)
+    {
+      sense2_i=5;
+      digitalWrite(led2,LOW);
+    }
+  }
+
+  if(sense3==1)
+  {
+    sense3_i=0;
+    digitalWrite(led3,HIGH);
+  }
+  else
+  {
+    sense3_i=sense3_i+1;
+    if(sense3_i >= 2)
+    {
+      sense3_i=5;
+      digitalWrite(led3,LOW);
+    }
+  }
+}
